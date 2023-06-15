@@ -15,45 +15,44 @@ Session(app)
 
 tempDB = myDB()
 
-#temperatures = []
-#times = []
-#probeEnabled = False
+temperatures = []
+times = []
+probeEnabled = False
 
 @app.route('/plotTemps')
 def plotPlage() -> None:
-    return render_template('plots.html',timeList=session.get('times',[]),tempList=session.get('temperatures',[]))
+    return render_template('plots.html',timeList=times, tempList=temperatures)
 
 @app.route('/stopProbe', methods=["POST"])
 def stopProbe() -> None:
-    session['probeEnabled'] = False
+    global probeEnabled
+    probeEnabled = False
     response = jsonify(response = "Probe disabled.", code = 200)
     return response
 
 @app.route('/initiateProbe', methods=["POST"])
 def initiateProbe() -> None:
-    session['probeEnabled'] = True
+    global probeEnabled
+    probeEnabled = True
     response = jsonify(response = "Probe enabled.", code = 200)
     return response
 
 @app.route('/getProbeStatus', methods=["GET"]) #to be used by ESP32 to get probeEnabled status
 def getProbeStatus() -> None:
-    response = jsonify(response = {"Probe status" : session.get('probeEnabled',False)}, code = 200)
+    response = jsonify(response = {"Probe status" : probeEnabled}, code = 200)
     return response
 
 @app.route('/clearTemperature', methods=["POST"])
 def clearTemperature() -> None:
     tempDB.deleteTemps()
-    session['times'] =  []
-    session['temperatures'] =  []
-    session.modified = True
+    temperatures.clear()
+    times.clear()
     response = jsonify(response = "Successfully cleared temperature.", code = 200)
     return response
 
 @app.route("/", methods=["GET"])
 def getTemperature() -> None:
-    #session['times'] = []
-    #session['temperatures'] = []
-    return render_template('index.html',timeList=session.get('times',[]) or [],tempList=session.get('temperatures',[]) or [])
+    return render_template('index.html',timeList=times,tempList=temperatures)
 
 @app.route("/", methods=["POST"])
 def addTemperature() -> None:
@@ -62,15 +61,9 @@ def addTemperature() -> None:
     time = datetime.now(tz)
     temp = request.get_json()["temperature"]
 
-    timeTemp = session.get('times',[]) or []
-    tempTemp = session.get('temperatures',[]) or []
-    timeTemp.append(str(time))
-    tempTemp.append(int(temp))
+    temperatures.append(int(temp))
+    times.append(str(time))
 
-    session['times'] = timeTemp
-    session['temperatures'] = tempTemp
-
-    session.modified = True
     tempDB.addTemp(datetime.now(tz).strftime('%a %d %b %Y %I:%M%p'),temp)
 
     response = jsonify(response = "Successfully added temperature.", code = 201)
