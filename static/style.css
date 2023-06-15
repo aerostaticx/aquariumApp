@@ -1,0 +1,18 @@
+h1 {
+    border: 2px #eee solid;
+    color: black;
+    text-align: center;
+    padding: 10px;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 5%;
+}
+
+.centerButtonClass{
+    display: flex;
+    justify-content: center;
+    gap: 10px; /*
+}

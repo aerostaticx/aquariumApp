@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    table, th, td {
+      border:1px solid black;
+    }
+</style>
+<head>
+    <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> <!--import AJAX-->
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}">
+    <title>Temperature Data</title>
+</head>
+
+<script>
+    function clearTable()
+    {
+        $("#tempTable tbody tr").remove();
+        $.post('/clearTemperature')
+    }
+</script>
+
+<script>
+    function plotTemps()
+    {
+        window.open('/plotTemps');
+    }
+</script>
+
+<script>
+    function initiateProbe()
+    {
+        $.post('/initiateProbe')
+        alert("Probe enabled!")
+    }
+</script>
+
+<script>
+    function stopProbe()
+    {
+        $.post('/stopProbe')
+        alert("Probe disabled!")
+    }
+</script>
+
+<body>
+   <h1>Temperature Data</h1>
+   <div class='centerButtonClass'>
+       <button onclick=clearTable()>Clear Data</button>
+       <button onclick=plotTemps()>Plot Data</button>
+       <button onclick=initiateProbe()>Initiate Probe</button>
+       <button onclick=stopProbe()>Stop Probe</button>
+   </div>
+   <table class='center' id='tempTable'>
+       <thead>
+           <th>Time</th>
+           <th>Temperature (F)</th>
+       </thead>
+       {% for time,temp in zip(timeList,tempList) %}
+       <tr>
+           <td style="text-align: center">{{time}}</td>
+           <td style="text-align: center">{{temp}}</td>
+       </tr>
+       {% endfor %}
+   </table>
+</body>
+</html>
