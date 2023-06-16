@@ -4,7 +4,7 @@ import MySQLdb
 Database class. Supports simple functions regarding adding and deleting from table.
 """
 class myDB:
-    db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mypassword",database="aerostatic$TemperatureDB")
+    db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
 
     """
     Ctor

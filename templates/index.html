@@ -44,13 +44,45 @@
     }
 </script>
 
+<script>
+    function login()
+    {
+        let user = prompt("Enter your username.");
+        if(user == null)
+        {
+            alert("Login cancelled");
+        }
+        else
+        {
+            $.post('/login', data={'username' : user});
+            document.getElementById("clearButton").disabled = false;
+            document.getElementById("plotButton").disabled = false;
+            document.getElementById("startButton").disabled = false;
+            document.getElementById("stopButton").disabled = false;
+            alert("Logged in.");
+        }
+    }
+
+    function logout()
+    {
+        $.post('/logout')
+        document.getElementById("clearButton").disabled = true;
+        document.getElementById("plotButton").disabled = true;
+        document.getElementById("startButton").disabled = true;
+        document.getElementById("stopButton").disabled = true;
+        alert("Logged out.")
+    }
+</script>
+
 <body>
    <h1>Temperature Data</h1>
    <div class='centerButtonClass'>
-       <button onclick=clearTable()>Clear Data</button>
-       <button onclick=plotTemps()>Plot Data</button>
-       <button onclick=initiateProbe()>Initiate Probe</button>
-       <button onclick=stopProbe()>Stop Probe</button>
+       <button id="clearButton" onclick=clearTable() disabled>Clear Data</button>
+       <button id="plotButton" onclick=plotTemps() disabled>Plot Data</button>
+       <button id="startButton" onclick=initiateProbe() disabled>Initiate Probe</button>
+       <button id="stopButton" onclick=stopProbe() disabled>Stop Probe</button>
+       <button id="loginButton" onclick=login()>Login</button>
+       <button id="logoutButton" onclick=logout()>Logout</button>
    </div>
    <table class='center' id='tempTable'>
        <thead>

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, session, redirect
 from flask_session import Session
 from datetime import datetime
 from pytz import timezone
@@ -24,6 +24,22 @@ tempDB = myDB()
 temperatures = []
 times = []
 probeEnabled = False
+
+@app.route('/logout')
+def logout() -> None:
+    session.pop('username',None)
+    return jsonify(response = "Logged out.", code = 200)
+
+@app.route('/loggedIn')
+def loggedIn() -> None:
+    if 'username' not in session:
+        return "You're not logged in."
+    return "You're logged in with user: " + session['username']
+
+@app.route('/login', methods=['POST'])
+def login() -> None:
+    session['username'] = request.form['username']
+    return redirect('/loggedIn')
 
 """
 Routes to the plot page where line graph is plotted of the data. X axis: datetime, Y axis: temperature
