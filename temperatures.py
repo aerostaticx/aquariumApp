@@ -1,5 +1,5 @@
 
-# A very simple Flask Hello World app for you to get started with...
+
 
 from flask import Flask, jsonify, request, render_template, session
 from flask_session import Session
