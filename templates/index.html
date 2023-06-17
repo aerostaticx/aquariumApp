@@ -60,6 +60,7 @@
             document.getElementById("startButton").disabled = false;
             document.getElementById("stopButton").disabled = false;
             alert("Logged in.");
+            window.location.reload();
         }
     }
 
@@ -70,6 +71,7 @@
         document.getElementById("plotButton").disabled = true;
         document.getElementById("startButton").disabled = true;
         document.getElementById("stopButton").disabled = true;
+        $("#tempTable tbody tr").remove();
         alert("Logged out.")
     }
 </script>
@@ -84,6 +86,14 @@
        <button id="loginButton" onclick=login()>Login</button>
        <button id="logoutButton" onclick=logout()>Logout</button>
    </div>
+   {% if loggedIn %}
+        <script>
+            document.getElementById("clearButton").disabled = false;
+            document.getElementById("plotButton").disabled = false;
+            document.getElementById("startButton").disabled = false;
+            document.getElementById("stopButton").disabled = false;
+        </script>
+   {% endif %}
    <table class='center' id='tempTable'>
        <thead>
            <th>Time</th>

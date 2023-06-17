@@ -28,21 +28,70 @@ class myDB:
     Return:
         None
     """
-    def addTemp(self, time : str, temp : int) -> None:
+    def addTemp(self, mcuID : str, time : str, temp : int) -> None:
         cursor = self.db.cursor()
-        cursor.execute("INSERT INTO temps (time, temp) VALUES ('{}',{});".format(time,temp))
+        cursor.execute("INSERT INTO temps (mcuID, time, temp) VALUES ('{}','{}',{});".format(mcuID,time,temp))
         self.db.commit()
 
     """
     Used to delete entries in table.
 
     Args:
-        None
+        mcuID: Unique mcuID string
 
     Return:
         None
     """
-    def deleteTemps(self) -> None:
+    def deleteTemps(self, mcuID : str) -> None:
         cursor = self.db.cursor()
-        cursor.execute("DELETE FROM temps")
+        cursor.execute("DELETE FROM temps WHERE mcuID = '{}';".format(mcuID))
         self.db.commit()
+
+    """
+    Used to get entries in table.
+
+    Args:
+        mcuID: Unique mcuID string
+
+    Return:
+        List of tuples (datetime, temp)
+    """
+    def getTemps(self, mcuID : str) -> []:
+        cursor = self.db.cursor()
+        cursor.execute("SELECT time,temp FROM temps WHERE mcuID = '{}';".format(mcuID))
+        return cursor.fetchall()
+
+    """
+    Used to get probe status.
+
+    Args:
+        mcuID: Unique mcuID string
+
+    Return:
+        probeStatus
+    """
+    def getProbeStatus(self, mcuID : str) -> []:
+        cursor = self.db.cursor()
+        cursor.execute("SELECT probeStatus FROM probe WHERE mcuID = '{}';".format(mcuID))
+        return cursor.fetchone()
+
+    """
+    Used to set probe status. If the mcuID does not exist, it will be added along with it's set value.
+
+    Args:
+        mcuID: Unique mcuID string
+        probeStatus: Enabled or disabled bool
+
+    Return:
+        None
+    """
+
+    def setProbeStatus(self, mcuID : str, setStatus : bool) -> None:
+        cursor = self.db.cursor()
+        if self.getProbeStatus(mcuID) is None:
+            cursor.execute("INSERT INTO probe (mcuID, probeStatus) VALUES ('{}',{});".format(mcuID, setStatus))
+            self.db.commit()
+        else:
+            cursor.execute("UPDATE probe SET probeStatus = {} WHERE mcuID = '{}';".format(setStatus, mcuID))
+            self.db.commit()
+        return

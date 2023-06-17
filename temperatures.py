@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request, render_template, session, redirect
-from flask_session import Session
 from datetime import datetime
 from pytz import timezone
 from initDB import myDB
+import sys
 
 """
 Initialize app and configure for sessions (to be implemented in future).
@@ -12,20 +12,12 @@ This file defines API endpoints for the webserver, mostly POST and GET.
 app = Flask(__name__)
 app.jinja_env.globals.update(zip=zip) #defines jinja zip function to be same as py zip for HTML use
 app.config.update(SECRET_KEY="MyTotallSecreyKey")
-app.config['SESSION_TYPE'] = 'filesystem'
-Session(app)
+#app.config['SESSION_TYPE'] = 'filesystem'
 
-"""
-Yeah, globals because sessions don't work nice with ESP32.
 
-TODO: Either pass/return relevant variables or use classes.
-"""
 tempDB = myDB()
-temperatures = []
-times = []
-probeEnabled = False
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout() -> None:
     session.pop('username',None)
     return jsonify(response = "Logged out.", code = 200)
@@ -52,7 +44,11 @@ Return:
 """
 @app.route('/plotTemps')
 def plotPlage() -> None:
-    return render_template('plots.html',timeList=times, tempList=temperatures)
+    if 'username' in session:
+        retList = tempDB.getTemps(session['username'])
+        return render_template('plots.html',timeList=[time[0] for time in retList],tempList=[temp[1] for temp in retList])
+    else:
+        return render_template('plots.html',timeList=[],tempList=[])
 
 
 """
@@ -66,13 +62,12 @@ Return:
 """
 @app.route('/stopProbe', methods=["POST"])
 def stopProbe() -> None:
-    global probeEnabled
-    probeEnabled = False
+    tempDB.setProbeStatus(session['username'],False)
     response = jsonify(response = "Probe disabled.", code = 200)
     return response
 
 """
-Starts the data probe on the ESP32. Simply sets a global variable for the ESP32 to read in.
+Starts the data probe on the ESP32. Simply sets a db value for the ESP32 to read in.
 
 Args:
     None
@@ -82,13 +77,12 @@ Return:
 """
 @app.route('/initiateProbe', methods=["POST"])
 def initiateProbe() -> None:
-    global probeEnabled
-    probeEnabled = True
+    tempDB.setProbeStatus(session['username'],True)
     response = jsonify(response = "Probe enabled.", code = 200)
     return response
 
 """
-Endpoint used by ESP32 to get probeEnabled status
+Used by ESP32 to get probeEnabled status
 
 Args:
     None
@@ -96,8 +90,13 @@ Args:
 Return:
     None
 """
-@app.route('/getProbeStatus', methods=["GET"])
+@app.route('/getProbeStatus', methods=["POST"])
 def getProbeStatus() -> None:
+    probeEnabled = False
+    mcuID = request.get_json()["mcuID"]
+    result = tempDB.getProbeStatus(mcuID)
+    if result is not None:
+        probeEnabled = bool(result[0])
     response = jsonify(response = {"Probe status" : probeEnabled}, code = 200)
     return response
 
@@ -112,9 +111,7 @@ Return:
 """
 @app.route('/clearTemperature', methods=["POST"])
 def clearTemperature() -> None:
-    tempDB.deleteTemps()
-    temperatures.clear()
-    times.clear()
+    tempDB.deleteTemps(session['username'])
     response = jsonify(response = "Successfully cleared temperature.", code = 200)
     return response
 
@@ -129,7 +126,11 @@ Return:
 """
 @app.route("/", methods=["GET"])
 def getTemperature() -> None:
-    return render_template('index.html',timeList=times,tempList=temperatures)
+    if 'username' in session:
+        retList = tempDB.getTemps(session['username'])
+        return render_template('index.html',timeList=[time[0] for time in retList],tempList=[temp[1] for temp in retList],loggedIn=True)
+    else:
+        return render_template('index.html',timeList=[],tempList=[],loggedIn=False)
 
 """
 Used by ESP32 to add data to internal lists as well as mySQL table.
@@ -144,13 +145,10 @@ Return:
 def addTemperature() -> None:
     tz = timezone('EST')
 
-    time = datetime.now(tz)
     temp = request.get_json()["temperature"]
+    mcuID = request.get_json()["mcuID"]
 
-    temperatures.append(int(temp))
-    times.append(str(time))
-
-    tempDB.addTemp(datetime.now(tz).strftime('%a %d %b %Y %I:%M%p'),temp)
+    tempDB.addTemp(mcuID,datetime.now(tz).strftime('%a %d %b %Y %I:%M%p'),temp)
 
     response = jsonify(response = "Successfully added temperature.", code = 201)
     return response
