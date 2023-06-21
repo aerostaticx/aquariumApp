@@ -43,7 +43,7 @@ Return:
     None
 """
 @app.route('/plotTemps')
-def plotPlage() -> None:
+def plotPage() -> None:
     if 'username' in session:
         retList = tempDB.getTemps(session['username'])
         return render_template('plots.html',timeList=[time[0] for time in retList],tempList=[temp[1] for temp in retList])
@@ -52,7 +52,7 @@ def plotPlage() -> None:
 
 
 """
-Stops the data probe on the ESP32. Simply sets a global variable for the ESP32 to read in.
+Stops the data probe on the ESP32. Sets corresponding row in probes table to False
 
 Args:
     None
@@ -67,7 +67,7 @@ def stopProbe() -> None:
     return response
 
 """
-Starts the data probe on the ESP32. Simply sets a db value for the ESP32 to read in.
+Starts the data probe on the ESP32. Sets corresponding row in probes table to True.
 
 Args:
     None
@@ -82,7 +82,7 @@ def initiateProbe() -> None:
     return response
 
 """
-Used by ESP32 to get probeEnabled status
+Used by ESP32 to get probeEnabled status. Requires POST because ESP32 needs to send it's mcuID.
 
 Args:
     None
