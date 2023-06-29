@@ -1,10 +1,14 @@
 import MySQLdb
+import sys
+
+#TODO: See https://stackoverflow.com/questions/43663130/python-mysqldb-how-do-you-access-the-exception-error-code-in-operationalerror for specifying mySQLdb error code for try/catches.
+
 
 """
 Database class. Supports simple functions regarding adding and deleting from table.
 """
 class myDB:
-    db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB",connect_timeout=31536000)
+    db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
 
     """
     Ctor
@@ -16,22 +20,8 @@ class myDB:
     Dtor. Used for closing DB connection.
     """
     def __del__(self):
-        pass
-        # self.db.close()
-
-    """
-    Used to check relog into mySQL incase timeout.
-
-    Args:
-        None
-    Return:
-        None
-    """
-
-    def relog(self):
-        if(not self.db.open):
-            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB",connect_timeout=31536000)
-
+        print("DB Dtor", file=sys.stderr)
+        self.db.close()
 
     """
     Used to add temperature to the database.
@@ -44,9 +34,13 @@ class myDB:
         None
     """
     def addTemp(self, mcuID : str, time : str, temp : int) -> None:
-        self.relog()
-        cursor = self.db.cursor()
-        cursor.execute("INSERT INTO temps (mcuID, time, temp) VALUES ('{}','{}',{});".format(mcuID,time,temp))
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("INSERT INTO temps (mcuID, time, temp) VALUES ('{}','{}',{});".format(mcuID,time,temp))
+        except MySQLdb.OperationalError:
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+            cursor = self.db.cursor()
+            cursor.execute("INSERT INTO temps (mcuID, time, temp) VALUES ('{}','{}',{});".format(mcuID,time,temp))
         self.db.commit()
 
     """
@@ -59,9 +53,13 @@ class myDB:
         None
     """
     def deleteTemps(self, mcuID : str) -> None:
-        self.relog()
-        cursor = self.db.cursor()
-        cursor.execute("DELETE FROM temps WHERE mcuID = '{}';".format(mcuID))
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("DELETE FROM temps WHERE mcuID = '{}';".format(mcuID))
+        except MySQLdb.OperationalError:
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+            cursor = self.db.cursor()
+            cursor.execute("DELETE FROM temps WHERE mcuID = '{}';".format(mcuID))
         self.db.commit()
 
     """
@@ -74,9 +72,13 @@ class myDB:
         List of tuples (datetime, temp)
     """
     def getTemps(self, mcuID : str) -> []:
-        self.relog()
-        cursor = self.db.cursor()
-        cursor.execute("SELECT time,temp FROM temps WHERE mcuID = '{}';".format(mcuID))
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("SELECT time,temp FROM temps WHERE mcuID = '{}';".format(mcuID))
+        except MySQLdb.OperationalError:
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+            cursor = self.db.cursor()
+            cursor.execute("SELECT time,temp FROM temps WHERE mcuID = '{}';".format(mcuID))
         return cursor.fetchall()
 
     """
@@ -89,9 +91,13 @@ class myDB:
         probeStatus
     """
     def getProbeStatus(self, mcuID : str) -> []:
-        self.relog()
-        cursor = self.db.cursor()
-        cursor.execute("SELECT probeStatus FROM probe WHERE mcuID = '{}';".format(mcuID))
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("SELECT probeStatus FROM probe WHERE mcuID = '{}';".format(mcuID))
+        except MySQLdb.OperationalError:
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+            cursor = self.db.cursor()
+            cursor.execute("SELECT probeStatus FROM probe WHERE mcuID = '{}';".format(mcuID))
         return cursor.fetchone()
 
     """
@@ -105,12 +111,19 @@ class myDB:
         None
     """
     def setProbeStatus(self, mcuID : str, setStatus : bool) -> None:
-        self.relog()
         cursor = self.db.cursor()
         if self.getProbeStatus(mcuID) is None:
-            cursor.execute("INSERT INTO probe (mcuID, probeStatus) VALUES ('{}',{});".format(mcuID, setStatus))
+            try:
+                cursor.execute("INSERT INTO probe (mcuID, probeStatus) VALUES ('{}',{});".format(mcuID, setStatus))
+            except MySQLdb.OperationalError:
+                self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+                cursor.execute("INSERT INTO probe (mcuID, probeStatus) VALUES ('{}',{});".format(mcuID, setStatus))
             self.db.commit()
         else:
-            cursor.execute("UPDATE probe SET probeStatus = {} WHERE mcuID = '{}';".format(setStatus, mcuID))
+            try:
+                cursor.execute("UPDATE probe SET probeStatus = {} WHERE mcuID = '{}';".format(setStatus, mcuID))
+            except MySQLdb.OperationalError:
+                self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+                cursor.execute("UPDATE probe SET probeStatus = {} WHERE mcuID = '{}';".format(setStatus, mcuID))
             self.db.commit()
         return
