@@ -4,7 +4,7 @@ import MySQLdb
 Database class. Supports simple functions regarding adding and deleting from table.
 """
 class myDB:
-    db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+    db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB",connect_timeout=31536000)
 
     """
     Ctor
@@ -16,7 +16,22 @@ class myDB:
     Dtor. Used for closing DB connection.
     """
     def __del__(self):
-        self.db.close()
+        pass
+        # self.db.close()
+
+    """
+    Used to check relog into mySQL incase timeout.
+
+    Args:
+        None
+    Return:
+        None
+    """
+
+    def relog(self):
+        if(not self.db.open):
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB",connect_timeout=31536000)
+
 
     """
     Used to add temperature to the database.
@@ -29,6 +44,7 @@ class myDB:
         None
     """
     def addTemp(self, mcuID : str, time : str, temp : int) -> None:
+        self.relog()
         cursor = self.db.cursor()
         cursor.execute("INSERT INTO temps (mcuID, time, temp) VALUES ('{}','{}',{});".format(mcuID,time,temp))
         self.db.commit()
@@ -43,6 +59,7 @@ class myDB:
         None
     """
     def deleteTemps(self, mcuID : str) -> None:
+        self.relog()
         cursor = self.db.cursor()
         cursor.execute("DELETE FROM temps WHERE mcuID = '{}';".format(mcuID))
         self.db.commit()
@@ -57,6 +74,7 @@ class myDB:
         List of tuples (datetime, temp)
     """
     def getTemps(self, mcuID : str) -> []:
+        self.relog()
         cursor = self.db.cursor()
         cursor.execute("SELECT time,temp FROM temps WHERE mcuID = '{}';".format(mcuID))
         return cursor.fetchall()
@@ -71,6 +89,7 @@ class myDB:
         probeStatus
     """
     def getProbeStatus(self, mcuID : str) -> []:
+        self.relog()
         cursor = self.db.cursor()
         cursor.execute("SELECT probeStatus FROM probe WHERE mcuID = '{}';".format(mcuID))
         return cursor.fetchone()
@@ -85,8 +104,8 @@ class myDB:
     Return:
         None
     """
-
     def setProbeStatus(self, mcuID : str, setStatus : bool) -> None:
+        self.relog()
         cursor = self.db.cursor()
         if self.getProbeStatus(mcuID) is None:
             cursor.execute("INSERT INTO probe (mcuID, probeStatus) VALUES ('{}',{});".format(mcuID, setStatus))
