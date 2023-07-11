@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> <!--import AJAX-->
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'style.css') }}">
+    <title>Dosage Home Page</title>
+</head>
+
+<script>
+    function submitDosage()
+    {
+        let mondayChecked = document.getElementById("monday");
+        let tuesdayChecked = document.getElementById("tuesday");
+        let wednesdayChecked = document.getElementById("wednesday");
+        let thursdayChecked = document.getElementById("thursday");
+        let fridayChecked = document.getElementById("friday");
+        let saturdayChecked = document.getElementById("saturday");
+        let sundayChecked = document.getElementById("sunday");
+
+        let time = document.getElementById("dosageTime");
+        let dosage = document.getElementById("dosage");
+        $.post('/dosageStore', data={'mc' : mondayChecked.checked, 'tc' : tuesdayChecked.checked, 'wc' : wednesdayChecked.checked, 'rc' : thursdayChecked.checked, 'fc' : fridayChecked.checked, 'sc' : saturdayChecked.checked, 'suc' : sundayChecked.checked, 'time' : time.value, 'amount' : dosage.value});
+    }
+</script>
+
+<script>
+    function goHome()
+    {
+        window.location.href = "https://aerostatic.pythonanywhere.com/";
+    }
+</script>
+
+
+<body>
+    <h1>Dosage Setup</h1>
+    <div class='center2'>
+        <input type="checkbox" id="monday" name="monday" value="Monday">
+        <label for="monday">Monday</label>
+        <input type="checkbox" id="tuesday" name="tuesday" value="Tuesday">
+        <label for="tuesday">Tuesday</label>
+        <input type="checkbox" id="wednesday" name="wednesday" value="Wednesday">
+        <label for="wednesday">Wednesday</label>
+        <input type="checkbox" id="thursday" name="thursday" value="Thursday">
+        <label for="thursday">Thursday</label>
+        <input type="checkbox" id="friday" name="friday" value="Friday">
+        <label for="friday">Friday</label>
+        <input type="checkbox" id="saturday" name="saturday" value="Saturday">
+        <label for="saturday">Saturday</label>
+        <input type="checkbox" id="sunday" name="sunday" value="Sunday">
+        <label for="sunday">Sunday</label>
+    </div>
+    <div class='center2'>
+        <label for="dosageTime">Dosing time:</label>
+        <input type="time" id="dosageTime" name="dosageTime"><br><br>
+
+        <label for="dosage">Dosage (ml):</label>
+        <input type="range" id="dosage" name="dosage" min='0' max='10' step='1'><br><br>
+        <p><output id="dosageValue"></output> ml</p>
+    </div>
+    <div class='centerButtonClass'>
+        <button id="startDoseButton" onclick=submitDosage()>Start Dosing</button>
+        <button id="stopDoseButton">Stop Dosing</button>
+        <button id="goHomeButton" onclick=goHome()>Go Home</button>
+    </div>
+</body>
+
+
+
+<script>
+    const value = document.getElementById("dosageValue");
+    const input = document.getElementById("dosage");
+    value.textContent = input.value;
+    input.addEventListener("input", function() {
+      value.textContent = input.value;
+    });
+</script>
