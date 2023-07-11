@@ -36,27 +36,27 @@
 <body>
     <h1>Dosage Setup</h1>
     <div class='center2'>
-        <input type="checkbox" id="monday" name="monday" value="Monday">
+        <input type="checkbox" id="monday" name="monday" value="Monday" {% if 'M' in days %}checked{% endif %}>
         <label for="monday">Monday</label>
-        <input type="checkbox" id="tuesday" name="tuesday" value="Tuesday">
+        <input type="checkbox" id="tuesday" name="tuesday" value="Tuesday" {% if 'T' in days %}checked{% endif %}>
         <label for="tuesday">Tuesday</label>
-        <input type="checkbox" id="wednesday" name="wednesday" value="Wednesday">
+        <input type="checkbox" id="wednesday" name="wednesday" value="Wednesday" {% if 'W' in days %}checked{% endif %}>
         <label for="wednesday">Wednesday</label>
-        <input type="checkbox" id="thursday" name="thursday" value="Thursday">
+        <input type="checkbox" id="thursday" name="thursday" value="Thursday" {% if 'R' in days %}checked{% endif %}>
         <label for="thursday">Thursday</label>
-        <input type="checkbox" id="friday" name="friday" value="Friday">
+        <input type="checkbox" id="friday" name="friday" value="Friday" {% if 'F' in days %}checked{% endif %}>
         <label for="friday">Friday</label>
-        <input type="checkbox" id="saturday" name="saturday" value="Saturday">
+        <input type="checkbox" id="saturday" name="saturday" value="Saturday" {% if 'S' in days %}checked{% endif %}>
         <label for="saturday">Saturday</label>
-        <input type="checkbox" id="sunday" name="sunday" value="Sunday">
+        <input type="checkbox" id="sunday" name="sunday" value="Sunday" {% if 'X' in days %}checked{% endif %}>
         <label for="sunday">Sunday</label>
     </div>
     <div class='center2'>
         <label for="dosageTime">Dosing time:</label>
-        <input type="time" id="dosageTime" name="dosageTime"><br><br>
+        <input type="time" id="dosageTime" name="dosageTime" value={{minsAfterMidnight}}><br><br>
 
         <label for="dosage">Dosage (ml):</label>
-        <input type="range" id="dosage" name="dosage" min='0' max='10' step='1'><br><br>
+        <input type="range" id="dosage" name="dosage" min='0' max='10' step='1' value={{amount}}><br><br>
         <p><output id="dosageValue"></output> ml</p>
     </div>
     <div class='centerButtonClass'>
