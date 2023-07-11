@@ -11,8 +11,22 @@ h1 {
   margin-top: 5%;
 }
 
+.center2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .centerButtonClass{
     display: flex;
     justify-content: center;
-    gap: 10px; /*
+    gap: 10px;
+}
+
+.centerButtonLogClass{
+    display: flex;
+    justify-content: center;
+    margin-top: 1%;
+    gap: 10px;
 }

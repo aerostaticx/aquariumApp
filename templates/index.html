@@ -76,6 +76,13 @@
     }
 </script>
 
+<script>
+    function navigateDosage()
+    {
+        window.location.href = "https://aerostatic.pythonanywhere.com/dosageHome";
+    }
+</script>
+
 <body>
    <h1>Temperature Data</h1>
    <div class='centerButtonClass'>
@@ -83,8 +90,11 @@
        <button id="plotButton" onclick=plotTemps() disabled>Plot Data</button>
        <button id="startButton" onclick=initiateProbe() disabled>Initiate Probe</button>
        <button id="stopButton" onclick=stopProbe() disabled>Stop Probe</button>
-       <button id="loginButton" onclick=login()>Login</button>
-       <button id="logoutButton" onclick=logout()>Logout</button>
+       <button id="dosageButton" onclick=navigateDosage() disabled>Go to Dosing Page</button>
+   </div>
+   <div class='centerButtonLogClass'>
+        <button id="loginButton" onclick=login()>Login</button>
+        <button id="logoutButton" onclick=logout()>Logout</button>
    </div>
    {% if loggedIn %}
         <script>
@@ -92,6 +102,7 @@
             document.getElementById("plotButton").disabled = false;
             document.getElementById("startButton").disabled = false;
             document.getElementById("stopButton").disabled = false;
+            document.getElementById("dosageButton").disabled = false;
         </script>
    {% endif %}
    <table class='center' id='tempTable'>

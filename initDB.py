@@ -127,3 +127,40 @@ class myDB:
                 cursor.execute("UPDATE probe SET probeStatus = {} WHERE mcuID = '{}';".format(setStatus, mcuID))
             self.db.commit()
         return
+
+    def startDosage(self) -> None:
+        pass
+
+    def stopDosage(self) -> None:
+        pass
+
+    def getDosage(self, mcuID : str) -> []:
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("SELECT days, timeMinutesPastMidnight, amount FROM dosing WHERE mcuID = '{}';".format(mcuID))
+        except MySQLdb.OperationalError:
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+            cursor = self.db.cursor()
+            cursor.execute("SELECT days, timeMinutesPastMidnight, amount FROM dosing WHERE mcuID = '{}';".format(mcuID))
+        return cursor.fetchone()
+
+    def addDosage(self, mcuID : str, amount : int, days : str, time : str) -> None:
+        if self.getDosage(mcuID) is None:
+            try:
+                cursor = self.db.cursor()
+                cursor.execute("INSERT INTO dosing (mcuID, days, timeMinutesPastMidnight, amount) VALUES ('{}', '{}', '{}', {});".format(mcuID, days, time, amount))
+            except MySQLdb.OperationalError:
+                self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+                cursor = self.db.cursor()
+                cursor.execute("INSERT INTO dosing (mcuID, days, timeMinutesPastMidnight, amount) VALUES ('{}', '{}', '{}', {});".format(mcuID, days, time, amount))
+            self.db.commit()
+        else:
+            try:
+                cursor = self.db.cursor()
+                cursor.execute("UPDATE dosing SET days = '{}', timeMinutesPastMidnight = '{}', amount = {};".format(days, time, amount))
+            except MySQLdb.OperationalError:
+                self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+                cursor = self.db.cursor()
+                cursor.execute("UPDATE dosing SET days = '{}', timeMinutesPastMidnight = '{}', amount = {};".format(days, time, amount))
+            self.db.commit()
+

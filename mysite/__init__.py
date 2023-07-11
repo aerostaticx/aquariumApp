@@ -7,6 +7,8 @@ def create_app():
     app.static_folder = '../static'
 
     from mysite.routes import routeBP
+    from mysite.dosageRoutes import dosageRouteBP
     app.register_blueprint(routeBP)
+    app.register_blueprint(dosageRouteBP)
 
     return app
