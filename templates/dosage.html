@@ -26,6 +26,16 @@
 </script>
 
 <script>
+    function stopDosing()
+    {
+        $.ajax({
+        url: '/stopDosing',
+        type: 'PUT'
+        });
+    }
+</script>
+
+<script>
     function goHome()
     {
         window.location.href = "https://aerostatic.pythonanywhere.com/";
@@ -61,7 +71,7 @@
     </div>
     <div class='centerButtonClass'>
         <button id="startDoseButton" onclick=submitDosage()>Start Dosing</button>
-        <button id="stopDoseButton">Stop Dosing</button>
+        <button id="stopDoseButton" onclick=stopDosing()>Stop Dosing</button>
         <button id="goHomeButton" onclick=goHome()>Go Home</button>
     </div>
 </body>

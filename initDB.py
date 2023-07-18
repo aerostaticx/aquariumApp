@@ -128,11 +128,26 @@ class myDB:
             self.db.commit()
         return
 
-    def startDosage(self) -> None:
-        pass
+    def startDosage(self, mcuID : str) -> None:
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("UPDATE dosing SET enabled = true WHERE mcuID = '{}';".format(mcuID))
+        except MySQLdb.OperationalError:
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+            cursor = self.db.cursor()
+            cursor.execute("UPDATE dosing SET enabled = true WHERE mcuID = '{}';".format(mcuID))
+        self.db.commit()
 
-    def stopDosage(self) -> None:
-        pass
+    def stopDosage(self, mcuID : str) -> None:
+        try:
+            cursor = self.db.cursor()
+            cursor.execute("UPDATE dosing SET enabled = false WHERE mcuID = '{}';".format(mcuID))
+        except MySQLdb.OperationalError:
+            self.db = MySQLdb.connect(host="aerostatic.mysql.pythonanywhere-services.com",user="aerostatic",password="mydatabasepassword",database="aerostatic$TemperatureDB")
+            cursor = self.db.cursor()
+            cursor.execute("UPDATE dosing SET enabled = false WHERE mcuID = '{}';".format(mcuID))
+        self.db.commit()
+
 
     def getDosage(self, mcuID : str) -> []:
         try:

@@ -38,5 +38,13 @@ def dosageStore() -> None:
                     daysString += 'X'
     minAfterMid = int(req['time'][:2], 10) * 60 + int(req['time'][3:5], 10)
     tempDB.addDosage(session['username'], req['amount'], daysString, minAfterMid)
+    tempDB.startDosage(session['username'])
 
     return jsonify(response = "Dosing stored."), 200
+
+@dosageRouteBP.route('/stopDosing', methods=['PUT'])
+def stopDosing() -> None:
+    tempDB.stopDosage(session['username'])
+    return jsonify(response= "Stopped dosing."), 200
+
+
