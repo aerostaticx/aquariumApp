@@ -1,5 +1,5 @@
 # aquariumApp
-Backend/Frontend code for webserver for use with ESP32 to read and plot aquarium params and setup fertilizer dosing.
+Webserver for use with ESP32 to read and plot aquarium params and setup fertilizer dosing.
 
 Website is hosted at https://aerostatic.pythonanywhere.com/
 
